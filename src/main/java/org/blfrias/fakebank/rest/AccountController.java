@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -28,7 +27,7 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Customer Id must not be blank");
         }
 
-        if(Objects.isNull(accountDTO.getBalance()) || accountDTO.getBalance() < 0 ) {
+        if(accountDTO.getBalance() < 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Balance must not be less than 0");
         }
 
@@ -54,7 +53,7 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Source and target account numbers must not be blank");
         }
 
-        if (Objects.isNull(transferDTO.getAmount()) || transferDTO.getAmount() <= 0) {
+        if (transferDTO.getAmount() <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Amount must be greater than 0");
         }
 
