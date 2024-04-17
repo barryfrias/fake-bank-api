@@ -74,8 +74,25 @@ class CustomerServiceImplTest {
         CustomerDTO customerDTO = new CustomerDTO();
         Customer customer = new Customer();
         when(customerMapper.toDto(any())).thenReturn(customerDTO);
-        when(customerMapper.toEntity(any())).thenReturn(customer);
-        when(customerRepository.save(any())).thenReturn(customer);
+        when(customerRepository.findById(any())).thenReturn(Optional.of(customer));
 
+        Optional<CustomerDTO> CustomerDTO = customerService.updateName("123", "New Name");
+        assertEquals(customerDTO, CustomerDTO.orElse(null));
+
+        verify(customerRepository, times(1)).findById(any());
+        verify(customerMapper, times(1)).toDto(any());
+        verify(customerRepository, times(1)).save(any());
     }
+
+
+
+
+
+
+
+
+
+
+
+
 }

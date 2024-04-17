@@ -35,3 +35,25 @@ out/
 
 ### VS Code ###
 .vscode/
+/mongo_data/_mdb_catalog.wt
+/mongo_data/collection-0-2065682643063203378.wt
+/mongo_data/collection-0--7679620667950463970.wt
+/mongo_data/collection-2-2065682643063203378.wt
+/mongo_data/collection-4-2065682643063203378.wt
+/mongo_data/index-1-2065682643063203378.wt
+/mongo_data/index-1--7679620667950463970.wt
+/mongo_data/index-3-2065682643063203378.wt
+/mongo_data/index-5-2065682643063203378.wt
+/mongo_data/index-6-2065682643063203378.wt
+/mongo_data/diagnostic.data/metrics.2024-04-17T03-14-57Z-00000
+/mongo_data/diagnostic.data/metrics.2024-04-17T03-15-51Z-00000
+/mongo_data/diagnostic.data/metrics.interim
+/mongo_data/mongod.lock
+/mongo_data/sizeStorer.wt
+/mongo_data/storage.bson
+/mongo_data/WiredTiger
+/mongo_data/WiredTiger.lock
+/mongo_data/WiredTiger.turtle
+/mongo_data/WiredTiger.wt
+/mongo_data/WiredTigerHS.wt
+/mongo_data/journal/WiredTigerPreplog.0000000002
