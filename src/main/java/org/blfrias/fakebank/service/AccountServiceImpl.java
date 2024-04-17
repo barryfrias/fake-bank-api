@@ -5,12 +5,14 @@ import org.blfrias.fakebank.dto.AccountDTO;
 import org.blfrias.fakebank.dto.TransactionDTO;
 import org.blfrias.fakebank.mapper.AccountMapper;
 import org.blfrias.fakebank.mapper.TransactionMapper;
+import org.blfrias.fakebank.model.Account;
 import org.blfrias.fakebank.model.Transaction;
 import org.blfrias.fakebank.repository.AccountRepository;
 import org.blfrias.fakebank.repository.TransactionRepository;
 import org.blfrias.fakebank.util.BankAccountNumberGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
@@ -25,6 +27,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
+
 
     @Override
     public AccountDTO create(AccountDTO accountDTO) {
@@ -89,4 +92,64 @@ public class AccountServiceImpl implements AccountService {
             .map(transactionMapper::toDto)
             .collect(Collectors.toCollection(LinkedList::new));
     }
+    @Override
+    public boolean deleteByAccountNumber(String accountNumber) {
+        Optional<Account> accountOptional = accountRepository.findByAccountNumber(accountNumber);
+        if (accountOptional.isPresent()) {
+            accountRepository.deleteByAccountNumber(accountNumber);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public AccountDTO deposit(String accountNumber, double amount) {
+        if (!accountRepository.existsByAccountNumber(accountNumber)) {
+            throw new IllegalStateException("Account not found");
+        }
+        Optional<Account> accountOptional = accountRepository.findByAccountNumber(accountNumber);
+        if (accountOptional.isPresent()) {
+            Account account = accountOptional.get();
+            double newBalance = account.getBalance() + amount;
+            account.setBalance(newBalance);
+            accountRepository.save(account);
+            return accountMapper.toDto(account);
+        }
+        throw new IllegalStateException("Account not found");
+    }
+
+    @Override
+    public AccountDTO withdraw(String accountNumber, double amount) {
+        Optional<Account> accountOptional = accountRepository.findByAccountNumber(accountNumber);
+        if (accountOptional.isPresent()) {
+            Account account = accountOptional.get();
+            double currentBalance = account.getBalance();
+
+            if (currentBalance < amount) {
+                throw new IllegalStateException("Insufficient balance for withdrawal");
+            }
+
+            double newBalance = currentBalance - amount;
+            account.setBalance(newBalance);
+            accountRepository.save(account);
+            return accountMapper.toDto(account);
+        } else {
+            throw new IllegalStateException("Account not found");
+        }
+    }
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+

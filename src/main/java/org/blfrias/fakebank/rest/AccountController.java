@@ -23,11 +23,11 @@ public class AccountController {
     @Operation(summary = "Create a new account")
     @PostMapping
     public ResponseEntity<?> createAccount(@RequestBody AccountDTO accountDTO) {
-        if(StringUtils.isBlank(accountDTO.getCustomerId())) {
+        if (StringUtils.isBlank(accountDTO.getCustomerId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Customer Id must not be blank");
         }
 
-        if(accountDTO.getBalance() < 0) {
+        if (accountDTO.getBalance() < 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Balance must not be less than 0");
         }
 
@@ -58,14 +58,13 @@ public class AccountController {
         }
 
         if (!accountService.isValidAccount(transferDTO.getSourceAccountNumber())
-            || !accountService.isValidAccount(transferDTO.getTargetAccountNumber()))
-        {
+                || !accountService.isValidAccount(transferDTO.getTargetAccountNumber())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid source or target account");
         }
 
         try {
             var txnDTO = accountService.transferBalance(
-                transferDTO.getSourceAccountNumber(),transferDTO.getTargetAccountNumber(), transferDTO.getAmount()
+                    transferDTO.getSourceAccountNumber(), transferDTO.getTargetAccountNumber(), transferDTO.getAmount()
             );
             return ResponseEntity.ok(txnDTO);
         } catch (IllegalStateException e) {
@@ -77,5 +76,51 @@ public class AccountController {
     @GetMapping("/{accountNumber}/transactions")
     public List<TransactionDTO> getTransactionHistory(@PathVariable String accountNumber) {
         return accountService.getTransactionHistory(accountNumber);
+    }
+
+    @Operation(summary = "Delete a customer by ID")
+    @DeleteMapping("/{accountNumber}")
+    public ResponseEntity<?> deleteByAccountNumber(@PathVariable String accountNumber) {
+        boolean deleted = accountService.deleteByAccountNumber(accountNumber);
+        if (deleted) {
+            return new ResponseEntity<>("Account deleted successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Account with account Number " + accountNumber + " not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/{accountNumber}/deposit")
+    public ResponseEntity<?> deposit(@PathVariable String accountNumber, @RequestParam(name = "newAmount", required = false) Double newAmount) {
+        if (newAmount == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New amount must be provided");
+        }
+        if (newAmount <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New deposit amount must be greater than zero");
+        }
+        AccountDTO accountDTO = accountService.deposit(accountNumber, newAmount);
+
+        return ResponseEntity.ok(accountDTO);
+    }
+
+
+
+    @PutMapping("/{accountNumber}/withdraw")
+    public ResponseEntity<?> withdraw(@PathVariable String accountNumber, @RequestParam(name = "withdrawAmount") Double withdrawAmount) {
+        if (withdrawAmount == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Withdrawal amount must be provided");
+        }
+
+        if (withdrawAmount <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Withdrawal amount must be greater than zero");
+        }
+
+        try {
+
+            AccountDTO accountDTO = accountService.withdraw(accountNumber, withdrawAmount);
+
+            return ResponseEntity.ok(accountDTO);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }

@@ -1,5 +1,6 @@
 package org.blfrias.fakebank.rest;
 
+import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.blfrias.fakebank.dto.AccountDTO;
@@ -18,6 +19,7 @@ import java.util.List;
 public class CustomerController {
     private final CustomerService customerService;
     private final AccountService accountService;
+
 
     @Operation(summary = "Create a new customer")
     @PostMapping
@@ -44,5 +46,33 @@ public class CustomerController {
     @GetMapping("/{customerId}/accounts")
     public List<AccountDTO> getCustomerAccounts(@PathVariable String customerId) {
         return accountService.getAllByCustomerId(customerId);
+    }
+
+    @Operation(summary = "Delete a customer by ID")
+    @DeleteMapping("/{customerId}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable String customerId) {
+        boolean deleted = customerService.deleteById(customerId);
+        if (deleted) {
+            return new ResponseEntity<>("Customer deleted successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Customer with ID " + customerId + " not found", HttpStatus.NOT_FOUND);
+        }
+    }
+    @PutMapping("/{customerId}/updateName")
+    public ResponseEntity<?> updateCustomerName(@PathVariable String customerId, @RequestParam String newName) {
+        if (StringUtils.isBlank(customerId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Customer ID must not be blank");
+        }
+
+        if (StringUtils.isBlank(newName)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New name must not be blank");
+        }
+
+        try {
+            var updatedCustomer = customerService.updateName(customerId, newName);
+            return ResponseEntity.ok(updatedCustomer);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }

@@ -148,4 +148,17 @@ class AccountServiceImplTest {
         assertEquals(2, retrievedTransactions.size());
         verify(transactionRepository, times(1)).findAllByAccountNumber(any());
     }
+
+    @Test
+    void testDeleteByAccountNumber() {
+        AccountDTO accountDTO = new AccountDTO();
+        Account account = new Account();
+        when(accountMapper.toDto(any())).thenReturn(accountDTO);
+        when(accountRepository.findByAccountNumber(any())).thenReturn(Optional.of(account));
+        accountService.deleteByAccountNumber("123");
+        verify(accountRepository, times(1)).deleteByAccountNumber(any());
+    }
+
+
+
 }
