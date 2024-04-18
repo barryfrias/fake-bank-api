@@ -58,4 +58,41 @@ class CustomerServiceImplTest {
         assertEquals(customerDTO, retrievedCustomer.orElse(null));
         verify(customerRepository, times(1)).findById(any());
     }
+
+    @Test
+    void testDeleteCustomer() {
+        CustomerDTO customerDTO = new CustomerDTO();
+        Customer customer = new Customer();
+        when(customerMapper.toDto(any())).thenReturn(customerDTO);
+        when(customerRepository.findById(any())).thenReturn(Optional.of(customer));
+        customerService.deleteById("123");
+        verify(customerRepository, times(1)).deleteById(any());
+    }
+
+    @Test
+    void testUpdateCustomer() {
+        CustomerDTO customerDTO = new CustomerDTO();
+        Customer customer = new Customer();
+        when(customerMapper.toDto(any())).thenReturn(customerDTO);
+        when(customerRepository.findById(any())).thenReturn(Optional.of(customer));
+
+        Optional<CustomerDTO> CustomerDTO = customerService.updateName("123", "New Name");
+        assertEquals(customerDTO, CustomerDTO.orElse(null));
+
+        verify(customerRepository, times(1)).findById(any());
+        verify(customerMapper, times(1)).toDto(any());
+        verify(customerRepository, times(1)).save(any());
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }
